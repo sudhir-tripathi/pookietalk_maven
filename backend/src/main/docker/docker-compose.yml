@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: pookietalk_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pookietalk_v2
+      MYSQL_USER: pookieuser
+      MYSQL_PASSWORD: pookiepass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - pookietalk-network
+
+  backend:
+    build: .
+    container_name: pookietalk_backend
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/pookietalk_v2
+      SPRING_DATASOURCE_USERNAME: pookieuser
+      SPRING_DATASOURCE_PASSWORD: pookiepass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "false"
+    ports:
+      - "8080:8080"
+    networks:
+      - pookietalk-network
+
+volumes:
+  mysql_data:
+
+networks:
+  pookietalk-network:
+    driver: bridge
