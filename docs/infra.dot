@@ -1,0 +1,12 @@
+digraph INFRA {
+  node [ color = "black", fillcolor = "#E6E6E6", height =1, style = "filled,bold,rounded", fontname = "Arial" ];
+  "pookietalk_db" [ label = "pookietalk_db
+(Docker::Container)", shape =cylinder, fillcolor = "#FFCFB3" ];
+  "pookietalk_backend" [ label = "pookietalk_backend
+(Docker::Container)", shape =rectangle, fillcolor = "#B7E0FF" ];
+  "mysql_data" [ label = "mysql_data
+(Docker::Volume)", shape =cylinder, fillcolor = "#FFF5CD" ];
+  "pookietalk-network" [ label = "pookietalk-network
+(Docker::Network)", shape =rectangle ];
+  "pookietalk_backend" -> "pookietalk_db";
+}

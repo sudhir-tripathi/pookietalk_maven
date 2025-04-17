@@ -1,277 +1,201 @@
-/PookieTalk/
-├── /backend/
-│   ├── /src/
-│   │   ├── /main/
-│   │   │   ├── /java/
-│   │   │   │   └── /com/pookietalk/
-│   │   │   │       ├── /config/          # Application-wide configurations
-│   │   │   │       │   ├── SecurityConfig.java
-│   │   │   │       │   ├── JwtAuthFilter.java
-│   │   │   │       │   ├── WebSocketConfig.java
-│   │   │   │       │   ├── CorsConfig.java
-│   │   │   │       ├── /controller/     # API Endpoints (Controllers)
-│   │   │   │       │   ├── AuthController.java
-│   │   │   │       │   ├── UserController.java
-│   │   │   │       │   ├── ChatController.java
-│   │   │   │       │   ├── MessageController.java
-│   │   │   │       ├── /dto/            # Data Transfer Objects
-│   │   │   │       │   ├── AuthRequestDTO.java
-│   │   │   │       │   ├── AuthResponseDTO.java
-│   │   │   │       │   ├── UserDTO.java
-│   │   │   │       │   ├── ChatDTO.java
-│   │   │   │       │   ├── MessageDTO.java
-│   │   │   │       ├── /model/          # Database Entities (Models)
-│   │   │   │       │   ├── User.java
-│   │   │   │       │   ├── Chat.java
-│   │   │   │       │   ├── Message.java
-│   │   │   │       ├── /repository/     # Data Access Layer (JPA Repositories)
-│   │   │   │       │   ├── UserRepository.java
-│   │   │   │       │   ├── ChatRepository.java
-│   │   │   │       │   ├── MessageRepository.java
-│   │   │   │       ├── /service/        # Business Logic Layer (Services)
-│   │   │   │       │   ├── AuthService.java
-│   │   │   │       │   ├── UserService.java
-│   │   │   │       │   ├── ChatService.java
-│   │   │   │       │   ├── MessageService.java
-│   │   │   │       │   ├── JwtService.java
-│   │   │   │       ├── /util/           # Utility Classes (Helpers)
-│   │   │   │       │   ├── PasswordUtil.java
-│   │   │   │       ├── PookieTalkApplication.java # Main Spring Boot Entry Point
-│   │   │   └── /resources/
-│   │   │       └── application.yml   # Configurations (DB, Security, WebSocket)
-│   │   └── /test/
-│   │       └── /java/
-│   │           └── /com/pookietalk/
-│   │               ├── AuthServiceTest.java
-│   │               ├── UserServiceTest.java
-│   │   └── /docker/
-│   │       ├── Dockerfile       # Docker containerization
-│   │       └── docker-compose.yml # Backend + PostgreSQL setup
-│   │   └── /scripts/
-│   │       └── init-db.sql      # Database schema setup
-│   ├── pom.xml             # Spring Boot dependencies
-│   └── README.md           # Backend documentation
-│
-├── /frontend/
-│   ├── /public/                # Static assets
-│   │   ├── index.html         # Root HTML file
-│   │   ├── logo.png
-│   │   ├── robots.txt
-│   │   └── manifest.json      # PWA support
-│   ├── /src/
-│   │   ├── /assets/            # Images, icons, global styles
-│   │   │   ├── /icons/
-│   │   │   └── /images/
-│   │   ├── /components/        # Reusable UI components
-│   │   │   ├── ChatBox.tsx
-│   │   │   ├── Message.tsx
-│   │   │   ├── Sidebar.tsx
-│   │   │   ├── UserList.tsx
-│   │   │   ├── Navbar.tsx
-│   │   │   └── InputField.tsx
-│   │   ├── /pages/             # App pages
-│   │   │   ├── Login.tsx
-│   │   │   ├── Register.tsx
-│   │   │   ├── ChatRoom.tsx
-│   │   │   └── Profile.tsx
-│   │   ├── /context/           # Global state management (React Context API)
-│   │   │   ├── AuthContext.tsx
-│   │   │   └── ChatContext.tsx
-│   │   ├── /service/          # API calls to backend
-│   │   │   ├── authService.ts
-│   │   │   ├── chatService.ts
-│   │   │   └── userService.ts
-│   │   ├── /hook/             # Custom React Hooks
-│   │   │   ├── useAuth.ts
-│   │   │   └── useChat.ts
-│   │   ├── /route/            # React Router setup
-│   │   │   └── AppRoutes.tsx
-│   │   ├── /util/             # Utility functions (formatting, validation)
-│   │   │   ├── formatDate.ts
-│   │   │   └── validation.ts
-│   │   ├── App.tsx            # Main App Component
-│   │   └── index.tsx          # React entry point
-│   ├── package.json           # Project dependencies
-│   ├── tailwind.config.js     # Tailwind CSS config
-│   ├── tsconfig.json          # TypeScript config
-│   ├── vite.config.ts         # Vite config
-│   └── README.md              # Documentation
-│
-├── docker-compose.yml         # Runs backend + frontend together
-├── .gitignore                 # Ignore files for Git
-└── README.md                  # Project Documentation
-
-
-Step 1: Backend Development (Spring Boot + Java)
-Setup Spring Boot Project
-
-Configure dependencies in pom.xml
-
-Setup application.yml (Database, Security, WebSocket)
-
-Implement PookieTalkApplication.java (Main entry point)
-
-Security & Authentication
-
-Implement JWT-based authentication (JwtUtil.java, JwtAuthFilter.java, SecurityConfig.java)
-
-User authentication (AuthService.java, AuthController.java)
-
-Database & Models
-
-Define JPA entities (User.java, Chat.java, Message.java)
-
-Setup repositories (UserRepository.java, ChatRepository.java, MessageRepository.java)
-
-Business Logic & API Endpoints
-
-User services (UserService.java, UserController.java)
-
-Chat services (ChatService.java, ChatController.java)
-
-Message services (MessageService.java, MessageController.java)
-
-WebSocket for Real-time Chat
-
-Setup WebSocket (WebSocketConfig.java)
-
-Implement chat handling logic
-
-Testing & Deployment
-
-Write unit tests (AuthServiceTest.java, UserServiceTest.java)
-
-Setup Docker (Dockerfile, docker-compose.yml)
-
-Once the backend is functional, we will move to Frontend Development (React + TypeScript).
-
-
-
-
-hase 1: Authentication Setup
-Goal: Implement login and registration with JWT handling.
-
-Build AuthContext
-
-File: /context/AuthContext.tsx
-
-Store user, token, login(), logout()
-
-Persist token in localStorage or sessionStorage
-
-Create AuthService
-
-File: /service/authService.ts
-
-login(credentials): Promise<AuthResponseDTO>
-
-register(payload): Promise<AuthResponseDTO>
-
-Design Pages
-
-/pages/Login.tsx
-
-/pages/Register.tsx
-
-Forms with Tailwind, submit to authService, store token in context
-
-Token Handling
-
-Attach token in API calls using Axios interceptor
-
-File: /service/axiosConfig.ts
-
-✅ Phase 2: Protected Routes + Routing
-Goal: Ensure only logged-in users access app pages
-
-Setup Routing
-
-File: /route/AppRoutes.tsx
-
-Define routes using react-router-dom
-
-Create PrivateRoute wrapper component
-
-Redirect Logic
-
-If not logged in, redirect to /login
-
-If logged in and visit /login, redirect to /chatroom
-
-✅ Phase 3: User Listing and Profile
-Goal: View all users and their profiles
-
-UserService API
-
-File: /service/userService.ts
-
-getAllUsers(), getUserById()
-
-Components
-
-UserList.tsx: List of users from /api/users
-
-Profile.tsx: View individual user details
-
-UI Integration
-
-Fetch user list after login
-
-Token is sent automatically via Axios
-
-✅ Phase 4: Chat Functionality
-Goal: Enable real-time messaging via WebSockets
-
-WebSocket Setup
-
-Connect to backend WebSocket endpoint
-
-File: /context/ChatContext.tsx
-
-Components
-
-ChatRoom.tsx: Main chat page
-
-ChatBox.tsx: Messages display
-
-Message.tsx: Individual message bubbles
-
-InputField.tsx: Send new messages
-
-Handling Messages
-
-Real-time update using WebSocket onmessage
-
-Store chat messages in ChatContext
-
-✅ Phase 5: Polish & Utilities
-Goal: Improve UX, error handling, and responsiveness
-
-Error Handling
-
-Show toast alerts for failed requests (e.g., using react-toastify)
-
-Mobile Responsiveness
-
-Tailwind responsive layout tweaks
-
-Dark Mode Support (Optional)
-
-Use Tailwind’s dark mode classes
-
-✅ Phase 6: Testing & Deployment
-Goal: Ensure stability and deploy full app
-
-Test with Postman and frontend
-
-Login, register, chat
-
-Invalid tokens, expired tokens
-
-Bundle with Docker
-
-Use Dockerfile in frontend
-
-Update docker-compose.yml to include frontend service
-
-Push to GitHub + CI/CD (Optional)
+# PookieTalk - A Real-Time Chat Application with Secure Authentication
+
+PookieTalk is a modern, secure chat application that enables real-time communication between users through a web interface. Built with Spring Boot and React, it provides seamless messaging capabilities with JWT-based authentication and WebSocket integration for instant message delivery.
+
+The application features a robust backend architecture with Spring Security for authentication, WebSocket support for real-time messaging, and a responsive React frontend with TypeScript. It includes user management, private messaging, and persistent chat history stored in MySQL database. The application is containerized using Docker for easy deployment and scalability.
+
+## Repository Structure
+```
+.
+├── backend/                      # Spring Boot backend application
+│   ├── src/                     # Source code directory
+│   │   ├── main/               # Main application code
+│   │   │   ├── java/com/pookietalk/
+│   │   │   │   ├── config/    # Application configuration classes
+│   │   │   │   │   ├── CorsConfig.java        # CORS settings
+│   │   │   │   │   ├── JwtAuthFilter.java     # JWT authentication
+│   │   │   │   │   ├── SecurityConfig.java    # Security settings
+│   │   │   │   │   └── WebSocketConfig.java   # WebSocket setup
+│   │   │   │   ├── controllers/  # REST API endpoints
+│   │   │   │   │   ├── AuthController.java    # Authentication
+│   │   │   │   │   ├── ChatController.java    # Chat management
+│   │   │   │   │   ├── MessageController.java # Message handling
+│   │   │   │   │   └── UserController.java    # User management
+│   │   │   │   ├── dto/         # Data Transfer Objects
+│   │   │   │   ├── exceptions/  # Custom exceptions
+│   │   │   │   ├── models/      # Database entities
+│   │   │   │   ├── repositories/# Data access layer
+│   │   │   │   └── services/    # Business logic
+│   │   │   ├── resources/     # Application properties
+│   │   │   └── docker/        # Docker configuration
+│   │   └── test/              # Test cases
+│   └── pom.xml                # Maven configuration
+└── frontend/                    # React frontend application
+    ├── src/                    # Source code directory
+    │   ├── components/        # Reusable UI components
+    │   │   ├── ChatBox.tsx   # Chat display component
+    │   │   ├── Footer.tsx    # Application footer
+    │   │   ├── Header.tsx    # Application header
+    │   │   ├── InputField.tsx# Reusable input component
+    │   │   ├── MessageBubble.tsx # Message display
+    │   │   ├── Navbar.tsx    # Navigation component
+    │   │   ├── Sidebar.tsx   # Side navigation
+    │   │   └── UserList.tsx  # User listing component
+    │   ├── context/          # React context providers
+    │   │   ├── AuthContext.tsx # Authentication state
+    │   │   └── ChatContext.tsx # Chat state management
+    │   ├── hooks/            # Custom React hooks
+    │   │   ├── useAuth.ts    # Authentication hook
+    │   │   └── useChat.ts    # Chat functionality hook
+    │   ├── pages/            # Application pages
+    │   │   ├── ChatRoom.tsx  # Main chat interface
+    │   │   ├── Login.tsx     # Login page
+    │   │   ├── Profile.tsx   # User profile
+    │   │   └── Register.tsx  # Registration page
+    │   ├── services/         # API integration
+    │   │   ├── authService.ts # Auth API calls
+    │   │   ├── chatService.ts # Chat API calls
+    │   │   └── socketService.ts # WebSocket handling
+    │   └── utils/            # Utility functions
+    ├── package.json          # NPM configuration
+    ├── tsconfig.json        # TypeScript configuration
+    └── vite.config.ts       # Vite build configuration
+├── docs/                     # Documentation
+│   ├── infra.dot           # Infrastructure diagram source
+│   └── infra.svg           # Infrastructure diagram
+└── docker-compose.yml       # Main Docker composition
+```
+
+## Usage Instructions
+### Prerequisites
+- Java Development Kit (JDK) 21
+- Node.js 16.x or higher
+- MySQL 8.0
+- Docker and Docker Compose (optional)
+
+### Installation
+
+#### Backend Setup
+1. Configure MySQL database:
+```bash
+mysql -u root -p
+CREATE DATABASE pookietalk_v2;
+```
+
+2. Build and run the backend:
+```bash
+cd backend
+./mvnw clean install
+./mvnw spring-boot:run
+```
+
+#### Frontend Setup
+1. Install dependencies:
+```bash
+cd frontend
+npm install
+```
+
+2. Start the development server:
+```bash
+npm run dev
+```
+
+### Quick Start
+1. Access the application at `http://localhost:5173`
+2. Register a new account or login with existing credentials
+3. Start chatting with other users in real-time
+
+### More Detailed Examples
+#### Sending Messages
+```typescript
+// Using the chat service
+const sendMessage = async (content: string) => {
+  await chatService.sendMessage(user.email, content);
+};
+```
+
+#### WebSocket Connection
+```typescript
+// Connecting to WebSocket
+socketService.connect();
+socketService.onMessage((message) => {
+  // Handle incoming message
+});
+```
+
+### Troubleshooting
+#### Common Issues
+1. Database Connection Issues
+   - Error: `Unable to connect to MySQL database`
+   - Solution: Verify MySQL is running and credentials are correct in `application.yml`
+
+2. WebSocket Connection Failed
+   - Error: `WebSocket connection failed`
+   - Check CORS configuration in `WebSocketConfig.java`
+   - Verify the WebSocket endpoint URL matches in frontend configuration
+
+#### Debugging
+- Enable debug logs in `application.yml`:
+```yaml
+logging:
+  level:
+    com.pookietalk: DEBUG
+```
+- Check application logs in `backend/logs/`
+- Frontend console logs in browser developer tools
+
+## Data Flow
+The application follows a client-server architecture with WebSocket integration for real-time messaging.
+
+```ascii
+Client (React) <---> API Gateway (Spring) <---> Business Logic <---> Database
+     ^                                              ^
+     |                                              |
+     +-------------- WebSocket Server --------------+
+```
+
+Component interactions:
+1. Client authenticates using JWT tokens
+2. Authenticated clients establish WebSocket connection
+3. Messages are sent through REST API and WebSocket
+4. Server validates and persists messages
+5. Recipients receive messages via WebSocket
+6. Chat history is stored in MySQL database
+
+## Infrastructure
+
+![Infrastructure diagram](./docs/infra.svg)
+### Docker Resources
+- MySQL Database Container:
+  - Image: mysql:8.0
+  - Container name: pookietalk_db
+  - Exposed port: 3306
+  - Persistent volume: mysql_data
+
+- Backend Application Container:
+  - Custom image built from Dockerfile
+  - Container name: pookietalk_backend
+  - Exposed port: 8080
+  - Dependencies: MySQL container
+
+### Network Configuration
+- Network: pookietalk-network (bridge)
+- Internal communication between containers
+- Exposed ports for external access
+
+## Deployment
+1. Build Docker images:
+```bash
+docker-compose build
+```
+
+2. Start the application:
+```bash
+docker-compose up -d
+```
+
+3. Monitor logs:
+```bash
+docker-compose logs -f
+```
