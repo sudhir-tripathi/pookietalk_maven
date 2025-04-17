@@ -70,7 +70,7 @@ The application features a robust backend architecture with Spring Security for 
 ### Prerequisites
 - Java Development Kit (JDK) 21
 - Node.js 16.x or higher
-- MySQL 8.0
+- MySQL 8.3
 - Docker and Docker Compose (optional)
 
 ### Installation
@@ -79,7 +79,7 @@ The application features a robust backend architecture with Spring Security for 
 1. Configure MySQL database:
 ```bash
 mysql -u root -p
-CREATE DATABASE pookietalk_v2;
+CREATE DATABASE pookietalk;
 ```
 
 2. Build and run the backend:
