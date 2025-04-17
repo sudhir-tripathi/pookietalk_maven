@@ -11,13 +11,14 @@ import com.pookietalk.services.UserService;
 import com.pookietalk.utils.PasswordUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor; // Import ArgumentCaptor
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Optional;
 
@@ -52,71 +53,142 @@ public class AuthServiceTest {
 
     @Test
     void testAuthenticateUserSuccess() {
-        AuthRequestDTO request = new AuthRequestDTO("testuser", "password123", "test@email.com");
+        AuthRequestDTO request = AuthRequestDTO.builder()
+                .username("testuser")
+                .password("password123")
+                .email("test@email.com") // Assuming email is part of AuthRequestDTO
+                .build();
+
         User user = new User(1L, "testuser", "hashedpassword", "test@email.com", Role.USER);
 
         when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
-        when(authenticationManager.authenticate(any(Authentication.class)))
-                .thenReturn(new UsernamePasswordAuthenticationToken("testuser", "password123"));
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getUsername()).thenReturn("testuser");
-        when(userDetails.getPassword()).thenReturn("hashedpassword");
+        Authentication successfulAuth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(successfulAuth);
 
-        when(userService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        when(jwtService.generateToken(userDetails)).thenReturn("mocked-jwt-token");
+        when(jwtService.generateToken(user)).thenReturn("mocked-jwt-token");
 
         AuthResponseDTO response = authService.authenticate(request);
 
         assertNotNull(response);
         assertEquals("mocked-jwt-token", response.getToken());
-        assertEquals(1L, response.getId());
-        assertEquals("testuser", response.getUsername());
-        assertEquals("test@email.com", response.getEmail());
+        assertEquals(user.getId(), response.getId());
+        assertEquals(user.getUsername(), response.getUsername());
+        assertEquals(user.getEmail(), response.getEmail());
+
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtService).generateToken(user);
     }
 
     @Test
     void testAuthenticateUserNotFound() {
-        AuthRequestDTO request = new AuthRequestDTO("testuser", "password123", "test@email.com");
+        AuthRequestDTO request = AuthRequestDTO.builder()
+                .username("nonexistentuser")
+                .password("password123")
+                .email("test@email.com")
+                .build();
 
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new UsernameNotFoundException("User not found"));
 
-        assertThrows(RuntimeException.class, () -> authService.authenticate(request));
+        assertThrows(UsernameNotFoundException.class, () -> authService.authenticate(request));
+
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(jwtService, never()).generateToken(any());
     }
+
 
     @Test
     void testRegisterUserSuccess() {
-        AuthRequestDTO request = new AuthRequestDTO("testuser", "password123", "test@email.com");
+        AuthRequestDTO request = AuthRequestDTO.builder()
+                .username("newuser")
+                .password("password123")
+                .email("new@email.com")
+                .build();
 
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("newuser")).thenReturn(Optional.empty());
         when(passwordUtil.encode("password123")).thenReturn("encoded-password");
 
-        User savedUser = new User(1L, "testuser", "encoded-password", "test@email.com", Role.USER);
-        when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        // --- CHANGE: Use ArgumentCaptor to verify the User object being saved ---
+        // This represents the expected state *before* saving (no ID, encoded password)
+        User expectedUserBeforeSave = User.builder()
+                .username(request.getUsername())
+                .password("encoded-password") // Use the mocked encoded password
+                .email(request.getEmail())
+                .role(Role.USER) // Assuming default role is USER
+                // Include defaults from User class if they should be set before save
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .enabled(true)
+                .build();
 
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getUsername()).thenReturn("testuser");
-        when(userDetails.getPassword()).thenReturn("encoded-password");
+        // Define what the saved user should look like (mocked return from save)
+        User savedUser = User.builder()
+                .id(1L) // Example ID assigned by DB/JPA
+                .username(request.getUsername())
+                .password("encoded-password")
+                .email(request.getEmail())
+                .role(Role.USER)
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .enabled(true)
+                .build();
+        // Capture the argument passed to save
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        when(userRepository.save(userCaptor.capture())).thenReturn(savedUser);
+        // --- END CHANGE ---
 
-        when(userService.loadUserByUsername("testuser")).thenReturn(userDetails);
-        when(jwtService.generateToken(userDetails)).thenReturn("mocked-jwt-token");
+        when(jwtService.generateToken(savedUser)).thenReturn("mocked-jwt-token");
 
+        // --- Act ---
         AuthResponseDTO response = authService.register(request);
 
+        // --- Assert Response ---
         assertNotNull(response);
         assertEquals("mocked-jwt-token", response.getToken());
-        assertEquals(1L, response.getId());
-        assertEquals("testuser", response.getUsername());
-        assertEquals("test@email.com", response.getEmail());
+        assertEquals(savedUser.getId(), response.getId());
+        assertEquals(savedUser.getUsername(), response.getUsername());
+        assertEquals(savedUser.getEmail(), response.getEmail());
+
+        // --- Assert Interactions and Captured Argument ---
+        verify(userRepository).save(any(User.class)); // Verify save was called
+        User capturedUser = userCaptor.getValue(); // Get the captured user object
+
+        // Assert that the captured user matches the expected state before saving
+        // (ID will be null or 0 before save, password should be encoded)
+        assertNull(capturedUser.getId()); // ID should be null before JPA assigns it
+        assertEquals(expectedUserBeforeSave.getUsername(), capturedUser.getUsername());
+        assertEquals(expectedUserBeforeSave.getPassword(), capturedUser.getPassword());
+        assertEquals(expectedUserBeforeSave.getEmail(), capturedUser.getEmail());
+        assertEquals(expectedUserBeforeSave.getRole(), capturedUser.getRole());
+        // Optionally assert default boolean flags if important
+        assertTrue(capturedUser.isEnabled());
+        assertTrue(capturedUser.isAccountNonExpired());
+        assertTrue(capturedUser.isAccountNonLocked());
+        assertTrue(capturedUser.isCredentialsNonExpired());
+
+
+        verify(jwtService).generateToken(savedUser); // Verify token generation with the *saved* user
     }
 
     @Test
     void testRegisterUserAlreadyExists() {
-        AuthRequestDTO request = new AuthRequestDTO("testuser", "password123", "test@email.com");
+        AuthRequestDTO request = AuthRequestDTO.builder()
+                .username("existinguser")
+                .password("password123")
+                .email("existing@email.com")
+                .build();
 
-        User existingUser = new User(1L, "testuser", "hashedpassword", "test@email.com", Role.USER);
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(existingUser));
+        User existingUser = new User(1L, "existinguser", "hashedpassword", "existing@email.com", Role.USER);
+        when(userRepository.findByUsername("existinguser")).thenReturn(Optional.of(existingUser));
 
         assertThrows(IllegalArgumentException.class, () -> authService.register(request));
+
+        verify(userRepository).findByUsername("existinguser");
+        verify(userRepository, never()).save(any(User.class));
+        verify(jwtService, never()).generateToken(any());
     }
 }
